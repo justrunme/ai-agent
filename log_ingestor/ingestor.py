@@ -103,7 +103,7 @@ def ingest_logs(client, logs):
             )['data'][0]['embedding']
             
             # Store in Weaviate
-            wv.data_object.create(
+            client.data_object.create(
                 data_object={
                     'message': log_entry['message'],
                     'timestamp': log_entry['timestamp']
