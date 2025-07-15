@@ -86,10 +86,13 @@ class TestLogsEndpoint:
         mock_weaviate.return_value = mock_client
         
         # Mock OpenAI embedding response
-        mock_embedding_response = Mock()
-        mock_embedding_response.data = [Mock()]
-        mock_embedding_response.data[0].embedding = [0.1, 0.2, 0.3]
-        mock_embedding.return_value = mock_embedding_response
+        mock_embedding.return_value = {
+            'data': [
+                {
+                    'embedding': [0.1, 0.2, 0.3]
+                }
+            ]
+        }
         
         # Mock OpenAI chat response
         mock_chat_response = Mock()
