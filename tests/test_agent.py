@@ -64,7 +64,16 @@ class TestLogsEndpoint:
         """Test successful log analysis request."""
         # Mock Weaviate client
         mock_client = Mock()
-        mock_client.query.get.return_value.with_near_vector.return_value.with_limit.return_value.do.return_value = {
+        mock_query = Mock()
+        mock_near_vector = Mock()
+        mock_limit = Mock()
+        
+        # Set up the chain of mock calls
+        mock_client.query = mock_query
+        mock_query.get.return_value = mock_near_vector
+        mock_near_vector.with_near_vector.return_value = mock_limit
+        mock_limit.with_limit.return_value = mock_limit
+        mock_limit.do.return_value = {
             'data': {
                 'Get': {
                     'LogEntry': [
