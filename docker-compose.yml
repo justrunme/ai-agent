@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - '8081:8080'
+    environment:
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+    networks:
+      - ai-net
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8080 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: always
+
+  log-ingestor:
+    build: ./log_ingestor
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WEAVIATE_URL=http://weaviate:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    networks:
+      - ai-net
+    restart: always
+
+  agent:
+    build: ./agent
+    ports:
+      - '5001:5000'
+    env_file:
+      - .env
+    environment:
+      - WEAVIATE_URL=http://weaviate:8080
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    networks:
+      - ai-net
+    restart: always
+
+  web-ui:
+    image: nginx:alpine
+    ports:
+      - '8080:80'
+    volumes:
+      - ./web_ui:/usr/share/nginx/html
+    networks:
+      - ai-net
+    restart: always
+
+networks:
+  ai-net:
+    driver: bridge

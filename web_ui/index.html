@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI DevOps Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            display: none;
+        }
+
+        .response.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI DevOps Agent</h1>
+            <p>Интеллектуальный помощник для анализа логов и DevOps задач</p>
+        </div>
+
+        <div class="content">
+            <!-- Chat Section -->
+            <div class="section">
+                <h2>💬 Чат с агентом</h2>
+                <div class="form-group">
+                    <label for="chatInput">Ваше сообщение:</label>
+                    <input type="text" id="chatInput" placeholder="Привет, как тебя зовут?" />
+                </div>
+                <button onclick="sendChat()" id="chatBtn">Отправить</button>
+                
+                <div class="loading" id="chatLoading">
+                    <div class="spinner"></div>
+                    <p>Обрабатываю запрос...</p>
+                </div>
+                
+                <div class="response" id="chatResponse"></div>
+            </div>
+
+            <!-- Log Analysis Section -->
+            <div class="section">
+                <h2>📊 Анализ логов</h2>
+                <div class="form-group">
+                    <label for="logQuestion">Вопрос о логах:</label>
+                    <textarea id="logQuestion" placeholder="Почему упал сервис? Какие ошибки в логах?"></textarea>
+                </div>
+                <button onclick="analyzeLogs()" id="logBtn">Анализировать</button>
+                
+                <div class="loading" id="logLoading">
+                    <div class="spinner"></div>
+                    <p>Анализирую логи...</p>
+                </div>
+                
+                <div class="response" id="logResponse"></div>
+            </div>
+        </div>
+
+        <!-- Status Section -->
+        <div style="padding: 20px 30px; border-top: 1px solid #e9ecef;">
+            <div class="status" id="statusIndicator">
+                Проверяю статус сервисов...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        
+        // Check service status on load
+        window.onload = function() {
+            checkStatus();
+        };
+
+        async function checkStatus() {
+            const statusDiv = document.getElementById('statusIndicator');
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: 'ping' })
+                });
+                
+                if (response.ok) {
+                    statusDiv.className = 'status online';
+                    statusDiv.textContent = '✅ Сервисы работают нормально';
+                } else {
+                    throw new Error('Service not responding');
+                }
+            } catch (error) {
+                statusDiv.className = 'status offline';
+                statusDiv.textContent = '❌ Сервисы недоступны. Убедитесь, что Docker Compose запущен.';
+            }
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const button = document.getElementById('chatBtn');
+            const loading = document.getElementById('chatLoading');
+            const response = document.getElementById('chatResponse');
+            
+            if (!input.value.trim()) {
+                alert('Пожалуйста, введите сообщение');
+                return;
+            }
+
+            button.disabled = true;
+            loading.style.display = 'block';
+            response.style.display = 'none';
+
+            try {
+                const result = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: input.value })
+                });
+
+                const data = await result.json();
+                
+                if (result.ok) {
+                    response.className = 'response';
+                    response.innerHTML = `<strong>Ответ:</strong><br>${data.answer}`;
+                } else {
+                    throw new Error(data.error || 'Ошибка запроса');
+                }
+            } catch (error) {
+                response.className = 'response error';
+                response.innerHTML = `<strong>Ошибка:</strong><br>${error.message}`;
+            } finally {
+                loading.style.display = 'none';
+                response.style.display = 'block';
+                button.disabled = false;
+            }
+        }
+
+        async function analyzeLogs() {
+            const input = document.getElementById('logQuestion');
+            const button = document.getElementById('logBtn');
+            const loading = document.getElementById('logLoading');
+            const response = document.getElementById('logResponse');
+            
+            if (!input.value.trim()) {
+                alert('Пожалуйста, введите вопрос о логах');
+                return;
+            }
+
+            button.disabled = true;
+            loading.style.display = 'block';
+            response.style.display = 'none';
+
+            try {
+                const result = await fetch(`${API_BASE}/logs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: input.value })
+                });
+
+                const data = await result.json();
+                
+                if (result.ok) {
+                    response.className = 'response';
+                    response.innerHTML = `<strong>Анализ:</strong><br>${data.analysis}`;
+                } else {
+                    throw new Error(data.error || 'Ошибка запроса');
+                }
+            } catch (error) {
+                response.className = 'response error';
+                response.innerHTML = `<strong>Ошибка:</strong><br>${error.message}`;
+            } finally {
+                loading.style.display = 'none';
+                response.style.display = 'block';
+                button.disabled = false;
+            }
+        }
+
+        // Enter key handlers
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChat();
+            }
+        });
+
+        document.getElementById('logQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                analyzeLogs();
+            }
+        });
+    </script>
+</body>
+</html> 
