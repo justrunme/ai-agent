@@ -2,7 +2,7 @@
 
 Intelligent DevOps agent with log analysis and chat functionality, built on OpenAI GPT and Weaviate vector database.
 
-![CI/CD](https://github.com/justrunme/ai-agent/workflows/CI/badge.svg)
+![CI/CD](https://github.com/justrunme/ai-agent/workflows/CI%2FCD%20Pipeline/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-Compose-green.svg)
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT--3.5-orange.svg)
