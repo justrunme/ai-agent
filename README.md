@@ -233,7 +233,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Author**: justrunme
+- **Author**: Andrey Lesnikov, Senior DevOps & AI Platform Engineer, [ORCID](https://orcid.org/0009-0004-7583-4314)
 - **Email**: [justrunme@egmail.com]
 - **GitHub**: [@justrunme](https://github.com/justrunme)
 
